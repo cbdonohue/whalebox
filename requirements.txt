@@ -1,6 +1,0 @@
-# QEMU Runner Requirements
-# This project uses only Python standard library modules
-# No external dependencies required
-
-# Optional dependencies for enhanced functionality:
-# psutil>=5.8.0  # For system monitoring (optional)
