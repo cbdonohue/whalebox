@@ -4,3 +4,7 @@
 
 # Optional dependencies for enhanced functionality:
 # psutil>=5.8.0  # For system monitoring (optional)
+
+# Development and testing dependencies:
+# coverage>=6.0  # For test coverage analysis (optional)
+# pytest>=7.0    # Alternative test runner (optional)
