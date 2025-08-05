@@ -1,0 +1,51 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - '*.md'
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - '*.md'
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
+
+jobs:
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for README
+        run: |
+          if [ -f README.md ]; then
+            echo "✅ README.md exists"
+            wc -l README.md
+          else
+            echo "⚠️ No README.md found"
+          fi
+
+      - name: Validate Markdown files
+        uses: DavidAnson/markdownlint-action@v1
+        with:
+          files: '**/*.md'
+          config: |
+            {
+              "MD013": false,
+              "MD033": false,
+              "MD041": false
+            }
+        continue-on-error: true
+
+      - name: Check for broken links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'no'
+        continue-on-error: true
