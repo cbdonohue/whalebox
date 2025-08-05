@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Changes in this Release
+            
+            - Ubuntu VM Setup Script Release
+            - See commit history for detailed changes
+            
+            ## Usage
+            
+            ```bash
+            curl -O https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/setup-ubuntu-vm.sh
+            chmod +x setup-ubuntu-vm.sh
+            ./setup-ubuntu-vm.sh
+            ```
+          draft: false
+          prerelease: false

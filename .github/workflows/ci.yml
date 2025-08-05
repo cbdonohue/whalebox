@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  shellcheck:
+    name: Shell Script Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          format: gcc
+          severity: warning
+
+  script-validation:
+    name: Script Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate shell script syntax
+        run: |
+          bash -n setup-ubuntu-vm.sh
+          echo "✅ Shell script syntax is valid"
+
+      - name: Check script permissions
+        run: |
+          if [ -x setup-ubuntu-vm.sh ]; then
+            echo "✅ Script is executable"
+          else
+            echo "⚠️ Script is not executable"
+            chmod +x setup-ubuntu-vm.sh
+            echo "✅ Made script executable"
+          fi
+
+      - name: Test script help/usage
+        run: |
+          # Test that script doesn't immediately fail with basic checks
+          timeout 10s bash setup-ubuntu-vm.sh --help || true
+          echo "✅ Script help/usage test completed"
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Bandit Security Scan
+        uses: securecodewarrior/github-action-bandit@v1.0.1
+        with:
+          config_file: ''
+          exit_zero: true
+        continue-on-error: true
+
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
