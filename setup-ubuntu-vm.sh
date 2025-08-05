@@ -352,5 +352,7 @@ main() {
     print_warning "Cloud-init may not work reliably with standard Ubuntu Server ISO."
 }
 
-# Run main function
-main "$@"
+# Run main function only if not being sourced for testing
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]] && [[ "${TESTING:-}" != "true" ]]; then
+    main "$@"
+fi
